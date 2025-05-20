@@ -126,7 +126,6 @@
       <button class="btn" onclick="simulateCommand('resume')">resume</button>
       <button class="btn" onclick="simulateCommand('linkedin')">linkedin</button>
       <button class="btn" onclick="simulateCommand('github')">github</button>
-      <button class="btn" onclick="simulateCommand('logo')">logo</button>
       <button class="btn" onclick="simulateCommand('neofetch')">neofetch</button>
       <button class="btn" onclick="simulateCommand('pwd')">pwd</button>
       <button class="btn" onclick="simulateCommand('clear')">clear</button>
@@ -241,8 +240,6 @@
             term.write('\r\n' + (isRoot ? 'λ (root) ' : 'λ '));
         },
 
-        logo: `\n    _                           _     \n   / \\\   __ _ _   _ _   _ ___  | |__  \n  / _ \\\\ / _\` | | | | | | / __| | '_ \\\\ \n / ___ \\\\ (_| | |_| | |_| \\__ \\\\ | | | |\n/_/   \\\\_\\__,_|\\__, |\\__,_|___/ |_| |_|\n              |___/                   `,
-
         clear: () => {
             term.clear();
             term.write('\r\n' + (isRoot ? 'λ (root) ' : 'λ '));
@@ -331,36 +328,89 @@
     // Initialize particles.js
     particlesJS('particles-js', {
       particles: {
-        number: { value: 80, density: { enable: true, value_area: 800 } },
-        color: { value: '#00ffcc' },
-        shape: { type: 'circle' },
-        opacity: { value: 0.2, random: true },
-        size: { value: 3, random: true },
+        number: { value: 120, density: { enable: true, value_area: 800 } },
+        color: { value: ['#00ffcc', '#00ff99', '#00ffe5'] },
+        shape: {
+          type: ['circle', 'edge'],
+          stroke: { width: 0, color: '#00ffcc' },
+          polygon: { nb_sides: 6 }
+        },
+        opacity: {
+          value: 0.6,
+          random: true,
+          anim: {
+            enable: true,
+            speed: 1,
+            opacity_min: 0.1,
+            sync: false
+          }
+        },
+        size: {
+          value: 4,
+          random: true,
+          anim: {
+            enable: true,
+            speed: 2,
+            size_min: 0.1,
+            sync: false
+          }
+        },
         line_linked: {
           enable: true,
           distance: 150,
           color: '#00ffcc',
-          opacity: 0.2,
-          width: 1
+          opacity: 0.4,
+          width: 1.5,
+          shadow: {
+            enable: true,
+            color: '#00ffcc',
+            blur: 5
+          }
         },
         move: {
           enable: true,
-          speed: 2,
+          speed: 4,
           direction: 'none',
           random: true,
           straight: false,
-          out_mode: 'out',
-          bounce: false
+          out_mode: 'bounce',
+          bounce: true,
+          attract: {
+            enable: true,
+            rotateX: 600,
+            rotateY: 1200
+          }
         }
       },
       interactivity: {
         detect_on: 'canvas',
         events: {
-          onhover: { enable: true, mode: 'grab' },
+          onhover: {
+            enable: true,
+            mode: ['grab', 'bubble']
+          },
+          onclick: {
+            enable: true,
+            mode: 'repulse'
+          },
           resize: true
         },
         modes: {
-          grab: { distance: 140, line_linked: { opacity: 0.5 } }
+          grab: {
+            distance: 200,
+            line_linked: { opacity: 0.8 }
+          },
+          bubble: {
+            distance: 200,
+            size: 6,
+            duration: 0.3,
+            opacity: 0.8,
+            speed: 3
+          },
+          repulse: {
+            distance: 200,
+            duration: 0.4
+          }
         }
       },
       retina_detect: true
