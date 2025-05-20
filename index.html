@@ -15,6 +15,16 @@
       height: 100vh;
       display: flex;
       flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
     }
     .header {
       padding: 1rem 2rem 0 2rem;
@@ -63,9 +73,18 @@
     #terminal {
       width: 700px;
       height: 400px;
-      background-color: #1e1e2f;
+      background-color: rgba(30, 30, 47, 0.95);
       border-radius: 10px;
-      box-shadow: 0 0 25px #00ffcc;
+      box-shadow: 0 0 25px #00ffcc, inset 0 0 15px rgba(0, 255, 204, 0.2);
+      backdrop-filter: blur(5px);
+      position: relative;
+      z-index: 2;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    #terminal:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 35px #00ffcc, inset 0 0 15px rgba(0, 255, 204, 0.3);
     }
     .buttons {
       display: flex;
@@ -93,6 +112,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div id="particles-js"></div>
   <div class="header">Aayush Kushwaha</div>
   <div class="subheader">// Backend Developer | Python + FastAPI + Redis + RabbitMQ + Elasticsearch</div>
   <div class="hint">Try: whoami, skills, projects, neofetch, resume, linkedin, github, logo, sudo</div>
@@ -114,6 +134,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.min.js"></script>
   <script>
     const loadingSpinner = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
@@ -307,6 +328,51 @@
       input = '';
     }
 
+    // Initialize particles.js
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: '#00ffcc' },
+        shape: { type: 'circle' },
+        opacity: { value: 0.2, random: true },
+        size: { value: 3, random: true },
+        line_linked: {
+          enable: true,
+          distance: 150,
+          color: '#00ffcc',
+          opacity: 0.2,
+          width: 1
+        },
+        move: {
+          enable: true,
+          speed: 2,
+          direction: 'none',
+          random: true,
+          straight: false,
+          out_mode: 'out',
+          bounce: false
+        }
+      },
+      interactivity: {
+        detect_on: 'canvas',
+        events: {
+          onhover: { enable: true, mode: 'grab' },
+          resize: true
+        },
+        modes: {
+          grab: { distance: 140, line_linked: { opacity: 0.5 } }
+        }
+      },
+      retina_detect: true
+    });
+
+    // Load command history from localStorage
+    const savedHistory = localStorage.getItem('commandHistory');
+    if (savedHistory) {
+      history.push(...JSON.parse(savedHistory));
+      historyIndex = history.length;
+    }
+
     term.focus();
     term.onKey(e => {
       const char = e.key;
@@ -314,6 +380,8 @@
         if (input.trim() !== '') {
           term.write('\r\n');
           runCommand(input.trim());
+          // Save command history to localStorage
+          localStorage.setItem('commandHistory', JSON.stringify(history.slice(-50)));
           input = '';
         }
       } else if (char === '\u007F') {
