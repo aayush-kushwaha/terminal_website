@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio Terminal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0f172a;
+      color: #00ffcc;
+      font-family: 'Fira Code', monospace;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      padding: 1rem 2rem 0 2rem;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #00ffcc;
+      background-color: transparent;
+      font-family: 'Fira Code', monospace;
+      text-shadow: 0 0 12px #00ffe5, 0 0 24px #00ffe5;
+      animation: flicker 2s infinite alternate;
+    }
+    .subheader {
+      font-size: 1rem;
+      padding-left: 2rem;
+      color: #7fffd4;
+      font-family: 'Fira Code', monospace;
+      opacity: 0.8;
+    }
+    .hint {
+      font-size: 0.875rem;
+      color: #5eead4;
+      padding: 0 2rem 0.5rem;
+      font-family: 'Fira Code', monospace;
+      opacity: 0.6;
+    }
+    .hint::after {
+      content: " Don't use: sudo rm -rf / or sudo rm -rf /* (sudo password is 1234)";
+      display: block;
+      margin-top: 0.5rem;
+      color: #f87171;
+      font-size: 0.75rem;
+    }
+    @keyframes flicker {
+      0% { opacity: 1; }
+      50% { opacity: 0.85; }
+      100% { opacity: 1; }
+    }
+    .container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      padding-bottom: 2rem;
+    }
+    #terminal {
+      width: 700px;
+      height: 400px;
+      background-color: #1e1e2f;
+      border-radius: 10px;
+      box-shadow: 0 0 25px #00ffcc;
+    }
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-left: 1rem;
+    }
+    .btn {
+      background-color: #00ffcc;
+      color: #0f172a;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: 'Fira Code', monospace;
+      box-shadow: 0 0 10px rgba(0, 255, 204, 0.6);
+      transition: all 0.2s ease;
+    }
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.9);
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="header">Aayush Kushwaha</div>
+  <div class="subheader">// Backend Developer | Node.js + Redis + Docker</div>
+  <div class="hint">Try: whoami, skills, projects, neofetch, resume, linkedin, github, logo, sudo</div>
+  <div class="container">
+    <div id="terminal"></div>
+    <div class="buttons">
+      <button class="btn" onclick="simulateCommand('whoami')">whoami</button>
+      <button class="btn" onclick="simulateCommand('skills')">skills</button>
+      <button class="btn" onclick="simulateCommand('projects')">projects</button>
+      <button class="btn" onclick="simulateCommand('others')">others</button>
+      <button class="btn" onclick="simulateCommand('resume')">resume</button>
+      <button class="btn" onclick="simulateCommand('linkedin')">linkedin</button>
+      <button class="btn" onclick="simulateCommand('github')">github</button>
+      <button class="btn" onclick="simulateCommand('logo')">logo</button>
+      <button class="btn" onclick="simulateCommand('clear')">clear</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.min.js"></script>
+  <script>
+    const term = new Terminal({
+      cursorBlink: true,
+      fontFamily: 'Fira Code, monospace',
+      fontSize: 14,
+      theme: {
+        background: '#1e1e2f',
+        foreground: '#00ffcc'
+      },
+      convertEol: true,
+      disableStdin: false,
+      scrollOnUserInput: true,
+      scrollOnOutput: true
+    });
+    term.open(document.getElementById('terminal'));
+
+    function typeEffect(text, speed = 20) {
+      let i = 0;
+      function type() {
+        if (i < text.length) {
+          term.write(text[i++]);
+          setTimeout(type, speed);
+        } else {
+          term.write('\r\n' + (isRoot ? 'λ (root) ' : 'λ '));
+        }
+      }
+      type();
+    }
+
+    typeEffect("Type 'help' to see available commands.");
+
+    let input = '';
+    const history = [];
+    let historyIndex = -1;
+    let isRoot = false;
+    let awaitingSudoPassword = false;
+
+    const funnyRmRf = [
+      "Initiating self-destruct...\nDeleting the fabric of reality...\n.\n..\n...System is now a potato.\n",
+      "rm: Deleting your hopes, dreams, and `/system32`\nSkynet activated. Goodbye, human.\n",
+      "Deleting /\nRemoving your dignity...\nErasing childhood memories...\n.\n..\nOops, did you mean `rm -rf /my_ex` instead?\n",
+      "Sure! Let's delete everything. What could possibly go wrong? 😁\n",
+      "sudo rm -rf /*\n> Congratulations!\n> You’ve unlocked: “How to brick a Linux system in 0.2s”\n",
+      "[WARNING] Reality.exe not found.\nDeleting universe...\nGoodbye, Neo.\n",
+      "Deleting your system in 3...\n2...\n1...\nJust kidding. But seriously, don’t ever do that.\n"
+    ];
+
+    const commands = {
+        help: `\nSystem Commands:\n help - Show available commands\n clear - Clear the terminal\n neofetch - Display system info (Arch Linux style)\n\nPersonal Info:\n whoami - Show my identity\n skills - List my skills\n projects - Show my projects\n others - Show my soft skills\n resume - Download my resume\n linkedin - Open my LinkedIn\n github - Open my GitHub\n logo - Show logo\n sudo - Enter sudo mode\n\nFun Stuff:\n git, git push, git commit -m "fix"\n sudo apt update, sudo apt upgrade\n npm install, sl, top, fortune, sudo make me a sandwich`,
+        
+        whoami: `\n---------------------------------------------\n\nName: Kartik Jain\nEmail: contact@jkartik.in\nWebsite: jkartik.in`,
+
+        skills: `\nJavaScript\nNode.js\nReact\nExpress\nMongoDB\nFirebase\nGit\nDocker`,
+
+        projects: `\n- Taqneeq App Backend\n- ACM Certification Portal\n- VoxBridge (Hindi Call Transcriber)\n- CloudFrost (DNS portal)\n- Customized Discord Bots`,
+
+        others: `\nFast learner\nTeam leader\nProblem-solver\nEffective communicator`,
+
+        resume: () => {
+            window.open('https://yourdomain.com/resume.pdf', '_blank');
+            term.writeln('\nOpening resume...');
+            term.write('\r\n' + (isRoot ? 'λ (root) ' : 'λ '));
+        },
+
+        linkedin: `\nOpening LinkedIn: https://linkedin.com/in/KartikJain1410`,
+
+        github: `\nOpening GitHub: https://github.com/KartikJain14`,
+
+        logo: `\n  ____              _        \n |  _ \\ ___   __ _(_)__ __   \n | |_) / _ \\ / _\` | | '_ \\  \n |  _ < (_) | (_| | | | | | \n |_| \\_\\___/ \\__, |_|_| |_| \n             |___/`,
+
+        clear: () => {
+            term.clear();
+            term.write('\r\n' + (isRoot ? 'λ (root) ' : 'λ '));
+            term.scrollToBottom();
+            term.focus();
+        },
+
+        neofetch: () => {
+            term.writeln(`\n---------------------------------------------\n\n   /\\   User: jkartik\n  /  \\  OS: Arch Linux\n /_  _\\ Hostname: jkartik.in\n   ||    Time: ${new Date().toLocaleTimeString()}\n   ||    Email: contact@jkartik.in\n  /__\\   GitHub: github.com/KartikJain14\n /____\\  LinkedIn: linkedin.com/in/KartikJain1410`);
+            term.write('\r\n' + (isRoot ? 'λ (root) ' : 'λ '));
+            term.scrollToBottom();
+            term.focus();
+        },
+
+        exit: () => {
+            isRoot = false;
+            term.write('\r\nλ ');
+        },
+
+        git: `\nGit: Because copying and pasting into a zip file isn't version control.`,
+
+        "git push": `\nPushing your mistakes to production... Good luck, user.`,
+
+        "sudo apt update": `\nUpdating package lists...\nFetching the latest bugs...`,
+
+        "sudo apt upgrade": `\nUpgrading all packages...\nBreaking your custom setup...`,
+
+        "npm install": `\nDownloading the entire internet...\nInstalled 3 million packages in node_modules.`,
+
+        sl: `\nYou meant 'ls', but here's a train. 🚂💨 Choo choo!`,
+
+        "sudo make me a sandwich": `\nOkay. You're root. Sandwich is on the way 🥪.`,
+
+        top: `\nRealtime system monitor...\nWarning: 99.9% CPU used by 'regret'.`,
+
+        fortune: `\n“Your code will work... right before the demo.”`
+    };
+
+
+    function runCommand(cmd) {
+      if (cmd.trim() === '') return;
+      history.push(cmd);
+      historyIndex = history.length;
+      const lowerCmd = cmd.toLowerCase();
+
+      if (awaitingSudoPassword) {
+        awaitingSudoPassword = false; // Always reset
+        if (cmd === '1234') {
+            isRoot = true;
+            term.write('\r\nλ (root) ');
+        } else {
+            term.writeln('\r\nSorry, wrong password.');
+            term.write('\r\nλ ');
+        }
+        return;
+    }
+
+
+      if (lowerCmd === 'sudo') {
+        awaitingSudoPassword = true;
+        term.write('[sudo] password for user: ');
+        return;
+      }
+
+      if ((lowerCmd === 'sudo rm -rf /' || lowerCmd === 'sudo rm -rf /*') && isRoot) {
+        const response = funnyRmRf[Math.floor(Math.random() * funnyRmRf.length)];
+        typeEffect(response);
+        return;
+      }
+
+      if (typeof commands[cmd] === 'function') {
+        commands[cmd]();
+      } else if (commands[cmd]) {
+        term.writeln(commands[cmd]);
+        term.write('\r\n' + (isRoot ? 'λ (root) ' : 'λ '));
+        term.scrollToBottom();
+        term.focus();
+      } else {
+        term.writeln(`\nCommand not found: ${cmd}`);
+        term.write('\r\n' + (isRoot ? 'λ (root) ' : 'λ '));
+        term.scrollToBottom();
+        term.focus();
+      }
+    }
+
+    function simulateCommand(cmd) {
+      term.write(cmd + '\r\n');
+      runCommand(cmd);
+      input = '';
+    }
+
+    term.focus();
+    term.onKey(e => {
+      const char = e.key;
+      if (awaitingSudoPassword) {
+        if (char === '\r') {
+          term.write('\r\n');
+          runCommand(input);
+          input = '';
+        } else if (char === '\u007F') {
+          if (input.length > 0) {
+            input = input.slice(0, -1);
+            term.write('\b \b');
+          }
+        } else {
+          input += char;
+          term.write('*');
+        }
+        return;
+      }
+
+      if (char === '\r') {
+        if (input.trim() !== '') {
+          term.write('\r\n');
+          runCommand(input.trim());
+          input = '';
+        }
+      } else if (char === '\u007F') {
+        if (input.length > 0) {
+          input = input.slice(0, -1);
+          term.write('\b \b');
+        }
+      } else if (e.domEvent.key === 'ArrowUp') {
+        if (history.length && historyIndex > 0) {
+          historyIndex--;
+          overwriteInput(history[historyIndex]);
+        }
+      } else if (e.domEvent.key === 'ArrowDown') {
+        if (history.length && historyIndex < history.length - 1) {
+          historyIndex++;
+          overwriteInput(history[historyIndex]);
+        } else if (historyIndex === history.length - 1) {
+          historyIndex++;
+          overwriteInput('');
+        }
+      } else {
+        input += char;
+        term.write(char);
+      }
+      term.scrollToBottom();
+    });
+
+    function overwriteInput(newInput) {
+      while (input.length > 0) {
+        term.write('\b \b');
+        input = input.slice(0, -1);
+      }
+      input = newInput;
+      term.write(input);
+    }
+  </script>
+</body>
+</html>
