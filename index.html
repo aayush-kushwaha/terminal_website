@@ -41,7 +41,7 @@
       opacity: 0.6;
     }
     .hint::after {
-      content: " Don't use: sudo rm -rf / or sudo rm -rf /* (sudo password is 1234)";
+      content: "⚠️ Warning: Don't use sudo rm -rf / or sudo rm -rf /* ";
       display: block;
       margin-top: 0.5rem;
       color: #f87171;
@@ -94,7 +94,7 @@
 </head>
 <body>
   <div class="header">Aayush Kushwaha</div>
-  <div class="subheader">// Backend Developer | Node.js + Redis + Docker</div>
+  <div class="subheader">// Backend Developer | Python + FastAPI + Redis + RabbitMQ + Elasticsearch</div>
   <div class="hint">Try: whoami, skills, projects, neofetch, resume, linkedin, github, logo, sudo</div>
   <div class="container">
     <div id="terminal"></div>
@@ -107,7 +107,10 @@
       <button class="btn" onclick="simulateCommand('linkedin')">linkedin</button>
       <button class="btn" onclick="simulateCommand('github')">github</button>
       <button class="btn" onclick="simulateCommand('logo')">logo</button>
+      <button class="btn" onclick="simulateCommand('neofetch')">neofetch</button>
+      <button class="btn" onclick="simulateCommand('pwd')">pwd</button>
       <button class="btn" onclick="simulateCommand('clear')">clear</button>
+      <button class="btn" onclick="simulateCommand('help')">help</button>
     </div>
   </div>
 
@@ -160,27 +163,34 @@
     ];
 
     const commands = {
-        help: `\nSystem Commands:\n help - Show available commands\n clear - Clear the terminal\n neofetch - Display system info (Arch Linux style)\n\nPersonal Info:\n whoami - Show my identity\n skills - List my skills\n projects - Show my projects\n others - Show my soft skills\n resume - Download my resume\n linkedin - Open my LinkedIn\n github - Open my GitHub\n logo - Show logo\n sudo - Enter sudo mode\n\nFun Stuff:\n git, git push, git commit -m "fix"\n sudo apt update, sudo apt upgrade\n npm install, sl, top, fortune, sudo make me a sandwich`,
+        help: `\nSystem Commands:\n help - Show available commands\n clear - Clear the terminal\n neofetch - Display system info (Arch Linux style)\n\nPersonal Info:\n whoami - Show my identity\n skills - List my skills\n projects - Show my projects\n others - Show my soft skills\n resume - Download my resume\n linkedin - Open my LinkedIn\n github - Open my GitHub\n logo - Show logo\n sudo - Enter sudo mode\n\nFun Stuff:\n git, git push\n sudo apt update, sudo apt upgrade\n npm install, sl, top, fortune, sudo make me a sandwich`,
         
-        whoami: `\n---------------------------------------------\n\nName: Kartik Jain\nEmail: contact@jkartik.in\nWebsite: jkartik.in`,
+        whoami: `\nName: Aayush Kushwaha\nEmail: aayush.kushwaha2608@gmail.com\nWebsite: aayushkushwaha.com.np`,
 
-        skills: `\nJavaScript\nNode.js\nReact\nExpress\nMongoDB\nFirebase\nGit\nDocker`,
+        skills: `\nPython\nFastAPI\nFlask\nRedis\nRabbitMQ\nMongoDB\nElasticsearch\nGit\nDocker`,
 
         projects: `\n- Taqneeq App Backend\n- ACM Certification Portal\n- VoxBridge (Hindi Call Transcriber)\n- CloudFrost (DNS portal)\n- Customized Discord Bots`,
 
         others: `\nFast learner\nTeam leader\nProblem-solver\nEffective communicator`,
 
         resume: () => {
-            window.open('https://yourdomain.com/resume.pdf', '_blank');
+            window.open('https://aayushkushwaha.com.np/AayushKushwahaResume.pdf', '_blank');
             term.writeln('\nOpening resume...');
             term.write('\r\n' + (isRoot ? 'λ (root) ' : 'λ '));
         },
+        linkedin: () => {
+            window.open('https://www.linkedin.com/in/aayushkushwaha/', '_blank');
+            term.writeln('\nOpening LinkedIn...');
+            term.write('\r\n' + (isRoot ? 'λ (root) ' : 'λ '));
+        },
 
-        linkedin: `\nOpening LinkedIn: https://linkedin.com/in/KartikJain1410`,
+        github: () => {
+            window.open('https://www.github.com/aayush-kushwaha/', '_blank');
+            term.writeln('\nOpening github...');
+            term.write('\r\n' + (isRoot ? 'λ (root) ' : 'λ '));
+        },
 
-        github: `\nOpening GitHub: https://github.com/KartikJain14`,
-
-        logo: `\n  ____              _        \n |  _ \\ ___   __ _(_)__ __   \n | |_) / _ \\ / _\` | | '_ \\  \n |  _ < (_) | (_| | | | | | \n |_| \\_\\___/ \\__, |_|_| |_| \n             |___/`,
+        logo: `\n    _                           _     \n   / \\\   __ _ _   _ _   _ ___  | |__  \n  / _ \\\\ / _\` | | | | | | / __| | '_ \\\\ \n / ___ \\\\ (_| | |_| | |_| \\__ \\\\ | | | |\n/_/   \\\\_\\__,_|\\__, |\\__,_|___/ |_| |_|\n              |___/                   `,
 
         clear: () => {
             term.clear();
@@ -190,11 +200,13 @@
         },
 
         neofetch: () => {
-            term.writeln(`\n---------------------------------------------\n\n   /\\   User: jkartik\n  /  \\  OS: Arch Linux\n /_  _\\ Hostname: jkartik.in\n   ||    Time: ${new Date().toLocaleTimeString()}\n   ||    Email: contact@jkartik.in\n  /__\\   GitHub: github.com/KartikJain14\n /____\\  LinkedIn: linkedin.com/in/KartikJain1410`);
+            term.writeln(`\n\n   /\\   User: aayushkushwaha\n  /  \\  OS: Arch Linux\n /_  _\\ Hostname: aayushkushwaha.com.np\n   ||    Time: ${new Date().toLocaleTimeString()}\n   ||    Email: aayush.kushwaha2608@gmail.com\n  /__\\   GitHub: github.com/aayush-kushwaha/\n /____\\  LinkedIn: linkedin.com/in/aayushkushwaha`);
             term.write('\r\n' + (isRoot ? 'λ (root) ' : 'λ '));
             term.scrollToBottom();
             term.focus();
         },
+        
+        pwd: `\n/root/of/all/evil`,
 
         exit: () => {
             isRoot = false;
@@ -227,26 +239,14 @@
       historyIndex = history.length;
       const lowerCmd = cmd.toLowerCase();
 
-      if (awaitingSudoPassword) {
-        awaitingSudoPassword = false; // Always reset
-        if (cmd === '1234') {
-            isRoot = true;
-            term.write('\r\nλ (root) ');
-        } else {
-            term.writeln('\r\nSorry, wrong password.');
-            term.write('\r\nλ ');
-        }
-        return;
-    }
-
-
       if (lowerCmd === 'sudo') {
-        awaitingSudoPassword = true;
-        term.write('[sudo] password for user: ');
+        isRoot = true;
+        term.write('\r\nRoot access granted.\r\n');
+        term.write('λ (root) ');
         return;
       }
 
-      if ((lowerCmd === 'sudo rm -rf /' || lowerCmd === 'sudo rm -rf /*') && isRoot) {
+      if ((lowerCmd === 'sudo rm -rf /' || lowerCmd === 'sudo rm -rf /*')) {
         const response = funnyRmRf[Math.floor(Math.random() * funnyRmRf.length)];
         typeEffect(response);
         return;
@@ -276,23 +276,6 @@
     term.focus();
     term.onKey(e => {
       const char = e.key;
-      if (awaitingSudoPassword) {
-        if (char === '\r') {
-          term.write('\r\n');
-          runCommand(input);
-          input = '';
-        } else if (char === '\u007F') {
-          if (input.length > 0) {
-            input = input.slice(0, -1);
-            term.write('\b \b');
-          }
-        } else {
-          input += char;
-          term.write('*');
-        }
-        return;
-      }
-
       if (char === '\r') {
         if (input.trim() !== '') {
           term.write('\r\n');
