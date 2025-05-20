@@ -110,6 +110,7 @@
     }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="particles-js"></div>
@@ -328,93 +329,50 @@
     // Initialize particles.js
     particlesJS('particles-js', {
       particles: {
-        number: { value: 120, density: { enable: true, value_area: 800 } },
-        color: { value: ['#00ffcc', '#00ff99', '#00ffe5'] },
-        shape: {
-          type: ['circle', 'edge'],
-          stroke: { width: 0, color: '#00ffcc' },
-          polygon: { nb_sides: 6 }
-        },
+        number: { value: 100, density: { enable: true, value_area: 1000 } },
+        color: { value: '#00ffcc' },
+        shape: { type: 'circle' },
         opacity: {
-          value: 0.6,
+          value: 0.1,
           random: true,
           anim: {
             enable: true,
-            speed: 1,
-            opacity_min: 0.1,
+            speed: 0.3,
+            opacity_min: 0.05,
             sync: false
           }
         },
         size: {
-          value: 4,
+          value: 10,
           random: true,
           anim: {
             enable: true,
-            speed: 2,
-            size_min: 0.1,
+            speed: 0.3,
+            size_min: 0.5,
             sync: false
           }
         },
         line_linked: {
-          enable: true,
-          distance: 150,
-          color: '#00ffcc',
-          opacity: 0.4,
-          width: 1.5,
-          shadow: {
-            enable: true,
-            color: '#00ffcc',
-            blur: 5
-          }
+          enable: false
         },
         move: {
           enable: true,
-          speed: 4,
-          direction: 'none',
+          speed: 3,
           random: true,
-          straight: false,
-          out_mode: 'bounce',
-          bounce: true,
-          attract: {
-            enable: true,
-            rotateX: 600,
-            rotateY: 1200
-          }
+          out_mode: 'out'
         }
       },
       interactivity: {
         detect_on: 'canvas',
         events: {
-          onhover: {
-            enable: true,
-            mode: ['grab', 'bubble']
-          },
-          onclick: {
-            enable: true,
-            mode: 'repulse'
-          },
+          onhover: { enable: false },
+          onclick: { enable: false },
           resize: true
-        },
-        modes: {
-          grab: {
-            distance: 200,
-            line_linked: { opacity: 0.8 }
-          },
-          bubble: {
-            distance: 200,
-            size: 6,
-            duration: 0.3,
-            opacity: 0.8,
-            speed: 3
-          },
-          repulse: {
-            distance: 200,
-            duration: 0.4
-          }
         }
       },
       retina_detect: true
     });
+
 
     // Load command history from localStorage
     const savedHistory = localStorage.getItem('commandHistory');
