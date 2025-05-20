@@ -45,7 +45,7 @@
       display: block;
       margin-top: 0.5rem;
       color: #f87171;
-      font-size: 0.75rem;
+      font-size: 0.95rem;
     }
     @keyframes flicker {
       0% { opacity: 1; }
@@ -116,6 +116,32 @@
 
   <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.min.js"></script>
   <script>
+    const loadingSpinner = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+    let spinnerInterval;
+
+    function startSpinner() {
+      let i = 0;
+      spinnerInterval = setInterval(() => {
+        term.write('\b' + loadingSpinner[i]);
+        i = (i + 1) % loadingSpinner.length;
+      }, 80);
+    }
+
+    function stopSpinner() {
+      clearInterval(spinnerInterval);
+      term.write('\b ');
+    }
+
+    const welcomeBanner = `
+     █████╗  █████╗ ██╗   ██╗██╗   ██╗███████╗██╗  ██╗
+    ██╔══██╗██╔══██╗╚██╗ ██╔╝██║   ██║██╔════╝██║  ██║
+    ███████║███████║ ╚████╔╝ ██║   ██║███████╗███████║
+    ██╔══██║██╔══██║  ╚██╔╝  ██║   ██║╚════██║██╔══██║
+    ██║  ██║██║  ██║   ██║   ╚██████╔╝███████║██║  ██║
+    ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚══════╝╚═╝  ╚═╝
+    Welcome to my interactive terminal! Type 'help' for commands.
+    `;
+
     const term = new Terminal({
       cursorBlink: true,
       fontFamily: 'Fira Code, monospace',
@@ -144,7 +170,7 @@
       type();
     }
 
-    typeEffect("Type 'help' to see available commands.");
+    typeEffect(welcomeBanner);
 
     let input = '';
     const history = [];
@@ -163,15 +189,19 @@
     ];
 
     const commands = {
-        help: `\nSystem Commands:\n help - Show available commands\n clear - Clear the terminal\n neofetch - Display system info (Arch Linux style)\n\nPersonal Info:\n whoami - Show my identity\n skills - List my skills\n projects - Show my projects\n others - Show my soft skills\n resume - Download my resume\n linkedin - Open my LinkedIn\n github - Open my GitHub\n logo - Show logo\n sudo - Enter sudo mode\n\nFun Stuff:\n git, git push\n sudo apt update, sudo apt upgrade\n npm install, sl, top, fortune, sudo make me a sandwich`,
+        help: `\n\x1b[1;32mSystem Commands:\x1b[0m\n help - Show available commands\n clear - Clear the terminal\n ls - List directory contents\n cat - Read file contents\n neofetch - Display system info\n\n\x1b[1;32mPersonal Info:\x1b[0m\n whoami - Show my identity\n skills - List my skills\n projects - Show my projects\n others - Show my soft skills\n resume - Download my resume\n linkedin - Open my LinkedIn\n github - Open my GitHub\n logo - Show logo\n sudo - Enter sudo mode\n\n\x1b[1;32mFun Stuff:\x1b[0m\n git, git push\n sudo apt update, sudo apt upgrade\n npm install, sl, top, fortune\n\x1b[1;31mNote: Use with caution!\x1b[0m`,
         
-        whoami: `\nName: Aayush Kushwaha\nEmail: aayush.kushwaha2608@gmail.com\nWebsite: aayushkushwaha.com.np`,
+        whoami: `\n\x1b[1;36mName:\x1b[0m Aayush Kushwaha\n\x1b[1;36mEmail:\x1b[0m aayush.kushwaha2608@gmail.com\n\x1b[1;36mWebsite:\x1b[0m aayushkushwaha.com.np`,
 
-        skills: `\nPython\nFastAPI\nFlask\nRedis\nRabbitMQ\nMongoDB\nElasticsearch\nGit\nDocker`,
+        skills: `\n\x1b[1;33mLanguages:\x1b[0m\n • Python\n\n\x1b[1;33mFrameworks:\x1b[0m\n • FastAPI\n • Flask\n\n\x1b[1;33mDatabases & Tools:\x1b[0m\n • Redis\n • RabbitMQ\n • MongoDB\n • Elasticsearch\n • Git\n • Docker`,
 
-        projects: `\n- Taqneeq App Backend\n- ACM Certification Portal\n- VoxBridge (Hindi Call Transcriber)\n- CloudFrost (DNS portal)\n- Customized Discord Bots`,
+        projects: `\n\x1b[1;35m1. Taqneeq App Backend\x1b[0m\n   • Backend infrastructure for mobile app\n\n\x1b[1;35m2. ACM Certification Portal\x1b[0m\n   • Automated certification system\n\n\x1b[1;35m3. VoxBridge\x1b[0m\n   • Hindi Call Transcriber\n\n\x1b[1;35m4. CloudFrost\x1b[0m\n   • DNS management portal\n\n\x1b[1;35m5. Discord Bots\x1b[0m\n   • Custom automation bots`,
 
-        others: `\nFast learner\nTeam leader\nProblem-solver\nEffective communicator`,
+        others: `\n\x1b[1;34m• Fast learner\x1b[0m\n  Quick to adapt and master new technologies\n\n\x1b[1;34m• Team leader\x1b[0m\n  Experience in leading technical teams\n\n\x1b[1;34m• Problem-solver\x1b[0m\n  Strong analytical and debugging skills\n\n\x1b[1;34m• Effective communicator\x1b[0m\n  Clear and concise technical communication`,
+
+        ls: `\n\x1b[1;34m📁 projects/\x1b[0m\n\x1b[1;34m📁 skills/\x1b[0m\n\x1b[1;32m📄 resume.pdf\x1b[0m\n\x1b[1;32m📄 about.txt\x1b[0m`,
+
+        cat: `\n\x1b[1;33m=== About Me ===\x1b[0m\n\nPassionate backend developer with expertise in Python and modern web technologies. Love building scalable systems and solving complex problems.\n\nCurrently working on exciting projects in the realms of API development, system architecture, and cloud computing.\n\nAlways eager to learn and explore new technologies!`,
 
         resume: () => {
             window.open('https://aayushkushwaha.com.np/AayushKushwahaResume.pdf', '_blank');
@@ -233,7 +263,11 @@
     };
 
 
-    function runCommand(cmd) {
+    async function runCommand(cmd) {
+      startSpinner();
+      await new Promise(resolve => setTimeout(resolve, 500));  // Simulate command processing
+      stopSpinner();
+
       if (cmd.trim() === '') return;
       history.push(cmd);
       historyIndex = history.length;
