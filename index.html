@@ -411,7 +411,7 @@
         term.scrollToBottom();
         term.focus();
       } else {
-        term.writeln(`\nCommand not found: ${cmd}`);
+        term.writeln(`\n🤖 Command not recognized: ${cmd}\nTry typing 'help' to see what's possible.`);
         term.write('\r\n' + (isRoot ? 'λ (root) ' : 'λ '));
         term.scrollToBottom();
         term.focus();
