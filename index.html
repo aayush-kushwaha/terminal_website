@@ -116,7 +116,7 @@
   <div id="particles-js"></div>
   <div class="header">Aayush Kushwaha</div>
   <div class="subheader">// Backend Developer | Python + FastAPI + Redis + RabbitMQ + Elasticsearch</div>
-  <div class="hint">Try: whoami, skills, projects, neofetch, resume, linkedin, github, logo, sudo</div>
+  <div class="hint">Try: whoami, skills, projects, neofetch, resume, linkedin, github, logo, sudo, view logs</div>
   <div class="container">
     <div id="terminal"></div>
     <div class="buttons">
@@ -131,12 +131,104 @@
       <button class="btn" onclick="simulateCommand('pwd')">pwd</button>
       <button class="btn" onclick="simulateCommand('clear')">clear</button>
       <button class="btn" onclick="simulateCommand('help')">help</button>
+      <button class="btn" onclick="simulateCommand('view logs')" style="background-color: #5eead4;">view logs</button>
+    </div>
+    <div id="logs-container" style="display: none; width: 700px; height: 400px; background-color: rgba(30, 30, 47, 0.95); border-radius: 10px; box-shadow: 0 0 25px #00ffcc, inset 0 0 15px rgba(0, 255, 204, 0.2); backdrop-filter: blur(5px); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; overflow: auto; padding: 1rem; font-family: 'Fira Code', monospace; color: #00ffcc; font-size: 12px;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <div style="font-weight: bold;">Backend Logs</div>
+        <button onclick="toggleLogs()" style="background: none; border: none; color: #00ffcc; cursor: pointer;">✕</button>
+      </div>
+      <div id="logs-content"></div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.min.js"></script>
   <script>
+    // Log generation variables
+    let logsVisible = false;
+    let logInterval;
+    const logTypes = ['INFO', 'DEBUG', 'WARN', 'ERROR'];
+    const logServices = ['api', 'auth', 'db', 'cache', 'queue', 'search'];
+    const logMessages = [
+      'Connection established',
+      'Request received from client',
+      'Processing data',
+      'Cache hit for key: user_profile',
+      'Cache miss for key: analytics',
+      'Database query executed in 42ms',
+      'Authentication token verified',
+      'User session expired',
+      'Rate limit reached for IP: 192.168.1.1',
+      'Background job completed',
+      'Elasticsearch index updated',
+      'Message published to queue',
+      'Consumer processed message',
+      'API response sent with status 200',
+      'Slow query detected',
+      'Memory usage: 42%',
+      'CPU load: 12%',
+      'Disk I/O: 5MB/s',
+      'Network traffic: 2.3MB/s',
+      'Redis cache purged',
+      'Scheduled task started',
+      'Config reloaded',
+      'Healthcheck passed',
+      'Metrics collected'
+    ];
+    
+    function generateRandomLog() {
+      const timestamp = new Date().toISOString();
+      const type = logTypes[Math.floor(Math.random() * logTypes.length)];
+      const service = logServices[Math.floor(Math.random() * logServices.length)];
+      const message = logMessages[Math.floor(Math.random() * logMessages.length)];
+      const id = Math.random().toString(36).substring(2, 10);
+      
+      let color = '#00ffcc'; // Default color (INFO)
+      if (type === 'DEBUG') color = '#7fffd4';
+      if (type === 'WARN') color = '#ffcc00';
+      if (type === 'ERROR') color = '#ff6b6b';
+      
+      return `<div><span style="color: #5eead4;">${timestamp}</span> <span style="color: ${color};">[${type}]</span> <span style="color: #00ffcc;">[${service}]</span> <span style="color: #ffffff;">${message}</span> <span style="opacity: 0.5;">(${id})</span></div>`;
+    }
+    
+    function startLogGeneration() {
+      const logsContent = document.getElementById('logs-content');
+      // Add initial logs
+      for (let i = 0; i < 10; i++) {
+        logsContent.innerHTML += generateRandomLog();
+      }
+      
+      // Continue adding logs at random intervals
+      logInterval = setInterval(() => {
+        logsContent.innerHTML += generateRandomLog();
+        logsContent.scrollTop = logsContent.scrollHeight;
+        
+        // Keep only the last 100 logs to prevent performance issues
+        const logEntries = logsContent.children;
+        if (logEntries.length > 100) {
+          logsContent.removeChild(logEntries[0]);
+        }
+      }, 800 + Math.random() * 1200); // Random interval between 800ms and 2000ms
+    }
+    
+    function stopLogGeneration() {
+      clearInterval(logInterval);
+    }
+    
+    function toggleLogs() {
+      const logsContainer = document.getElementById('logs-container');
+      logsVisible = !logsVisible;
+      
+      if (logsVisible) {
+        logsContainer.style.display = 'block';
+        startLogGeneration();
+      } else {
+        logsContainer.style.display = 'none';
+        stopLogGeneration();
+      }
+    }
+    
     const loadingSpinner = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
     let spinnerInterval;
 
@@ -210,7 +302,7 @@
     ];
 
     const commands = {
-        help: `\n\x1b[1;32mSystem Commands:\x1b[0m\n help - Show available commands\n clear - Clear the terminal\n ls - List directory contents\n cat - Read file contents\n neofetch - Display system info\n\n\x1b[1;32mPersonal Info:\x1b[0m\n whoami - Show my identity\n skills - List my skills\n projects - Show my projects\n others - Show my soft skills\n resume - Download my resume\n linkedin - Open my LinkedIn\n github - Open my GitHub\n logo - Show logo\n sudo - Enter sudo mode\n\n\x1b[1;32mFun Stuff:\x1b[0m\n git, git push\n sudo apt update, sudo apt upgrade\n npm install, sl, top, fortune\n\x1b[1;31mNote: Use with caution!\x1b[0m`,
+        help: `\n\x1b[1;32mSystem Commands:\x1b[0m\n help - Show available commands\n clear - Clear the terminal\n ls - List directory contents\n cat - Read file contents\n neofetch - Display system info\n view logs - Show backend logs\n\n\x1b[1;32mPersonal Info:\x1b[0m\n whoami - Show my identity\n skills - List my skills\n projects - Show my projects\n others - Show my soft skills\n resume - Download my resume\n linkedin - Open my LinkedIn\n github - Open my GitHub\n logo - Show logo\n sudo - Enter sudo mode\n\n\x1b[1;32mFun Stuff:\x1b[0m\n git, git push\n sudo apt update, sudo apt upgrade\n npm install, sl, top, fortune\n\x1b[1;31mNote: Use with caution!\x1b[0m`,
         
         whoami: `\n\x1b[1;36mName:\x1b[0m Aayush Kushwaha\n\x1b[1;36mEmail:\x1b[0m aayush.kushwaha2608@gmail.com\n\x1b[1;36mWebsite:\x1b[0m aayushkushwaha.com.np`,
 
@@ -278,7 +370,13 @@
 
         top: `\nRealtime system monitor...\nWarning: 99.9% CPU used by 'regret'.`,
 
-        fortune: `\n“Your code will work... right before the demo.”`
+        fortune: `\n"Your code will work... right before the demo."`,
+        
+        "view logs": () => {
+            toggleLogs();
+            term.writeln('\nOpening backend logs...');
+            term.write('\r\n' + (isRoot ? 'λ (root) ' : 'λ '));
+        }
     };
 
 
